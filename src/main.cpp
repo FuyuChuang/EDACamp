@@ -7,13 +7,14 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 #include "checker.h"
 using namespace std;
 
-const char* usageStr = "Usage: ./FM_Partitioner <input file> <output file>";
 
 int main(int argc, char** argv)
 {
+    const char* usageStr = (string("Usage: ") + argv[0] + "<input file> <result file>").c_str();
     fstream input, output;
 
     if (argc == 3) {
@@ -37,7 +38,6 @@ int main(int argc, char** argv)
 
     Checker* checker = new Checker(input, output);
     checker->check();
-    checker->printSummary();
 
     return 0;
 }

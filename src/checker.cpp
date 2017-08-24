@@ -10,8 +10,6 @@
 #include <sstream>
 #include <cassert>
 #include <vector>
-#include <cmath>
-#include <map>
 #include "checker.h"
 
 #define SRC 0
@@ -21,11 +19,6 @@
 
 using namespace std;
 
-void Checker::printSummary() const
-{
-
-    return;
-}
 
 void Checker::check()
 {
@@ -105,6 +98,7 @@ void Checker::check()
         }
     }
 
+    // check clearing all traffics
     bool clear = true;
     for (size_t i = 0, end = _input.size(); i < end; ++i) {
         if (!_input[i].empty()) {
@@ -166,17 +160,6 @@ void Checker::parseInput(fstream& inFile)
         ++lineCount;
     }
 
-    /*
-    for (size_t i = 0, end = _input.size(); i < end; ++i) {
-        while(!_input[i].empty()) {
-            Car car = _input[i].front();
-            _input[i].pop();
-            cout << char(car._dest) << " ";
-        }
-        cout << endl;
-    }
-    */
-
     return;
 }
 
@@ -219,17 +202,6 @@ void Checker::parseResult(fstream& result)
         }
         ++lineCount;
     }
-
-    /*
-    for (size_t i = 0, end = _result.size(); i < end; ++i) {
-        while(!_result[i].empty()) {
-            int dest = _result[i].front();
-            _result[i].pop();
-            cout << setw(3) << dest << " ";
-        }
-        cout << endl;
-    }
-    */
 
     return;
 }

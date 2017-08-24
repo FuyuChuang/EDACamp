@@ -35,9 +35,6 @@ public:
     // modify method
     void check();
 
-    // member functions about reporting
-    void printSummary() const;
-
 private:
     vector<queue<Car> >     _input;
     vector<queue<int> >     _result;
