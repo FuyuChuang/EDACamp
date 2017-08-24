@@ -14,6 +14,8 @@
 #include "car.h"
 using namespace std;
 
+using Point = pair<int, int>;
+
 #define N 0
 #define E 1
 #define S 2
@@ -41,12 +43,14 @@ public:
 private:
     vector<queue<Car> >     _input;
     vector<queue<int> >     _result;
-
+    Point                   _coordinateTable[2][4];
+    int                     _dirTable[4];
 
     // Private member functions
     // parse
     void parseInput(fstream& inFile);
     void parseResult(fstream& result);
+    bool checkConflicts(const vector<pair<int, int> >& commands);
 };
 
 #endif  // CHECKER_H

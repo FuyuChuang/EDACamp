@@ -13,6 +13,12 @@
 #include <cmath>
 #include <map>
 #include "checker.h"
+
+#define SRC 0
+#define DEST 1
+#define DIR_X 0
+#define DIR_Y 1
+
 using namespace std;
 
 void Checker::printSummary() const
@@ -23,6 +29,20 @@ void Checker::printSummary() const
 
 void Checker::check()
 {
+    _coordinateTable[SRC][N] = Point(1, 3);
+    _coordinateTable[DEST][N] = Point(2, 3);
+    _coordinateTable[SRC][E] = Point(3, 2);
+    _coordinateTable[DEST][E] = Point(3, 1);
+    _coordinateTable[SRC][S] = Point(2, 0);
+    _coordinateTable[DEST][S] = Point(1, 0);
+    _coordinateTable[SRC][W] = Point(0, 1);
+    _coordinateTable[DEST][W] = Point(0, 2);
+
+    _dirTable[N] = DIR_Y;
+    _dirTable[E] = DIR_X;
+    _dirTable[S] = DIR_Y;
+    _dirTable[W] = DIR_X;
+
     int timeCount = 0;
     vector<queue<Car> > output;
     output.resize(4);
@@ -191,4 +211,85 @@ void Checker::parseResult(fstream& result)
     */
 
     return;
+}
+
+bool Checker::checkConflicts(const vector<pair<int, int> >& commands) {
+  bool grid[4][4] = {};
+
+  for (const auto& c : commands) {
+    const Point src = _coordinateTable[SRC][c.first];
+    const Point dest = _coordinateTable[DEST][c.second];
+    const int dir = _dirTable[c.first];
+
+    bool hasConflict = false;
+    int x = src.first;
+    int y = src.second;
+    if (dir == DIR_X) {
+      while (x != dest.first) {
+        (x < dest.first) ? ++x : --x;
+
+        if (grid[x][y]) {
+          hasConflict = true;
+          break;
+        }
+
+        grid[x][y] = true;
+      }
+
+      if (hasConflict) {
+        return true;
+      }
+
+      while (y != dest.second) {
+        (y < dest.second) ? ++y : --y;
+
+        if (grid[x][y]) {
+          hasConflict = true;
+          break;
+        }
+
+        grid[x][y] = true;
+      }
+
+      if (hasConflict) {
+        return true;
+      }
+    } else {
+      while (y != dest.second) {
+        (y < dest.second) ? ++y : --y;
+
+        if (grid[x][y]) {
+          hasConflict = true;
+          break;
+        }
+
+        grid[x][y] = true;
+      }
+
+      if (hasConflict) {
+        return true;
+      }
+
+      while (x != dest.first) {
+        (x < dest.first) ? ++x : --x;
+
+        if (grid[x][y]) {
+          hasConflict = true;
+          break;
+        }
+
+        grid[x][y] = true;
+      }
+
+      if (hasConflict) {
+        return true;
+      }
+    }
+
+    if (hasConflict) {
+      return true;
+    }
+  }
+
+  return false;
 }
