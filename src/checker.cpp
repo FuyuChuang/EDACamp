@@ -1,7 +1,7 @@
 /****************************************************************************
   FileName  [ checker.cpp ]
   Synopsis  [ Implementation of the EDACamp competition checker. ]
-  Author    [ Fu-Yu Chuang ]
+  Author    [ Fu-Yu Chuang, Yu-Hsuan Chang ]
   Date      [ 2017.8.24 ]
 ****************************************************************************/
 #include <iostream>
