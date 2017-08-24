@@ -104,6 +104,18 @@ void Checker::check()
             totalRound += waitRound;
         }
     }
+
+    bool clear = true;
+    for (size_t i = 0, end = _input.size(); i < end; ++i) {
+        if (!_input[i].empty()) {
+            clear = false;
+        }
+    }
+    if (!clear) {
+        cout << "Cheat! You mother fucker." << endl;
+        return;
+    }
+
     cout << "Total waiting rounds = " << totalRound << endl;
     cout << "Average waiting rounds = " << double(totalRound) / _carCount << endl;
 
