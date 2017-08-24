@@ -24,11 +24,63 @@ void Checker::printSummary() const
 void Checker::check()
 {
     int timeCount = 0;
+    vector<queue<Car> > output;
+    output.resize(4);
 
+    while (!_result[0].empty()) {
+        vector<pair<int, int> > commands;
+        size_t lineCount = 0;
 
-    for (auto& q : _result) {
+        // set up commands
+        for (auto& q : _result) {
+            int dest = q.front();
+            q.pop();
+            commands.push_back(make_pair(lineCount, dest));
+            ++lineCount;
+        }
 
+        // check right cars
+        for (auto& c : commands) {
+            // check no U-turns
+            if (c.first == c.second) {
+                cout << "U-turn at time = " << timeCount << endl;
+                return;
+            }
+
+            // check right cars in queue
+            // cout << c.first << " " << c.second << endl;
+            if (c.second != -1) {
+                Car car = _input[c.first].front();
+                _input[c.first].pop();
+                if (car._dest != c.second) {
+                    cout << "Illegal car at time = " << timeCount << endl;
+                    return;
+                }
+
+                car._depTime = timeCount;
+                if (car._arrTime > car._depTime) {
+                    cout << "Illegal car at time = " << timeCount << ". Depart before Arrival." << endl;
+                    return;
+                }
+                output[c.first].push(car);
+            }
+        }
+        ++timeCount;
     }
+
+
+    // calculate total rounds
+    int totalRound = 0;
+    for (size_t i = 0, end = output.size(); i < end; ++i) {
+        while (!output[i].empty()) {
+            Car car = output[i].front();
+            output[i].pop();
+            int waitRound = car._depTime - car._arrTime;
+            assert(waitRound >= 0);
+            totalRound += waitRound;
+        }
+    }
+    cout << "Total waiting rounds = " << totalRound << endl;
 
     return;
 }
@@ -47,8 +99,26 @@ void Checker::parseInput(fstream& inFile)
                 ++timeCount;
                 continue;
             }
-            if (token[1] != '0') {
-                _input[lineCount].push(Car(token[1], timeCount));
+            switch(token[1]) {
+                case 'N': {
+                    _input[lineCount].push(Car(0, timeCount));
+                    break;
+                }
+                case 'E': {
+                    _input[lineCount].push(Car(1, timeCount));
+                    break;
+                }
+                case 'S': {
+                    _input[lineCount].push(Car(2, timeCount));
+                    break;
+                }
+                case 'W': {
+                    _input[lineCount].push(Car(3, timeCount));
+                    break;
+                }
+                default: {
+                    break;
+                }
             }
             ++timeCount;
         }

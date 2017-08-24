@@ -21,7 +21,7 @@ public:
     }
     ~Car() { }
 
-    size_t  _dest;
+    int     _dest;
     size_t  _arrTime;
     size_t  _depTime;
 };
