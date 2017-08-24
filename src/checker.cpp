@@ -68,7 +68,6 @@ void Checker::check()
             }
 
             // check right cars in queue
-            // cout << c.first << " " << c.second << endl;
             if (c.second != -1) {
                 Car car = _input[c.first].front();
                 _input[c.first].pop();
@@ -85,6 +84,11 @@ void Checker::check()
                 output[c.first].push(car);
             }
         }
+
+        if (checkConflicts(commands)) {
+            cout << "Conflicts occur at time = " << timeCount << endl;
+        }
+
         ++timeCount;
     }
 
@@ -101,6 +105,7 @@ void Checker::check()
         }
     }
     cout << "Total waiting rounds = " << totalRound << endl;
+    cout << "Average waiting rounds = " << double(totalRound) / _carCount << endl;
 
     return;
 }
@@ -122,18 +127,22 @@ void Checker::parseInput(fstream& inFile)
             switch(token[1]) {
                 case 'N': {
                     _input[lineCount].push(Car(0, timeCount));
+                    ++_carCount;
                     break;
                 }
                 case 'E': {
                     _input[lineCount].push(Car(1, timeCount));
+                    ++_carCount;
                     break;
                 }
                 case 'S': {
                     _input[lineCount].push(Car(2, timeCount));
+                    ++_carCount;
                     break;
                 }
                 case 'W': {
                     _input[lineCount].push(Car(3, timeCount));
+                    ++_carCount;
                     break;
                 }
                 default: {
@@ -217,6 +226,10 @@ bool Checker::checkConflicts(const vector<pair<int, int> >& commands) {
   bool grid[4][4] = {};
 
   for (const auto& c : commands) {
+    if (c.second == -1) {
+        continue;
+    }
+
     const Point src = _coordinateTable[SRC][c.first];
     const Point dest = _coordinateTable[DEST][c.second];
     const int dir = _dirTable[c.first];

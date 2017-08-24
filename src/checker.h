@@ -26,13 +26,11 @@ class Checker
 public:
     // constructor and destructor
     Checker(fstream& inFile, fstream& result) :
-        _input(4), _result(4) {
+        _input(4), _result(4), _carCount(0) {
         parseInput(inFile);
         parseResult(result);
     }
     ~Checker() { }
-
-    // basic access methods
 
     // modify method
     void check();
@@ -45,6 +43,7 @@ private:
     vector<queue<int> >     _result;
     Point                   _coordinateTable[2][4];
     int                     _dirTable[4];
+    int                     _carCount;
 
     // Private member functions
     // parse
