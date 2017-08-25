@@ -4,16 +4,19 @@
   Author    [ Fu-Yu Chuang ]
   Date      [ 2017.8.23 ]
 ****************************************************************************/
-#include <iostream>
-#include <fstream>
-#include <string>
-#include "checker.h"
-using namespace std;
 
+#include "checker.hpp"
+
+#include <fstream>
+#include <iostream>
+#include <string>
+
+using namespace std;
 
 int main(int argc, char** argv)
 {
-    const char* usageStr = (string("Usage: ") + argv[0] + "<input file> <result file>").c_str();
+    const char* usageStr =
+        (string("Usage: ") + argv[0] + "<input file> <result file>").c_str();
     fstream input, result;
 
     if (argc == 3) {
@@ -29,8 +32,7 @@ int main(int argc, char** argv)
                  << "\". The program will be terminated..." << endl;
             exit(1);
         }
-    }
-    else {
+    } else {
         cerr << usageStr << endl;
         exit(1);
     }
@@ -42,4 +44,3 @@ int main(int argc, char** argv)
 
     return 0;
 }
-

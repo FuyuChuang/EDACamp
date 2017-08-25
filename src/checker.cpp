@@ -4,18 +4,25 @@
   Author    [ Fu-Yu Chuang, Yu-Hsuan Chang ]
   Date      [ 2017.8.24 ]
 ****************************************************************************/
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
+
+#include "checker.hpp"
+
 #include <cassert>
-#include "checker.h"
+#include <cmath>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+
 using namespace std;
+
+#define N 0
+#define E 1
+#define S 2
+#define W 3
 
 #define SRC 0
 #define DST 1
-#define DIR_X 0
-#define DIR_Y 1
 
 void Checker::printSummary() const
 {
@@ -23,7 +30,8 @@ void Checker::printSummary() const
     cout << "==================== Summary ====================" << endl;
     cout << " Total car number: " << _carCount << endl;
     cout << " Total rounds spent: " << _totalRound << endl;
-    cout << " Average waiting rounds: " << double(_totalRound) / _carCount << endl;
+    cout << " Average waiting rounds: " << double(_totalRound) / _carCount
+         << endl;
     cout << "=================================================" << endl;
     cout << endl;
 
@@ -35,7 +43,7 @@ bool Checker::check()
     int timeCount = 0;
 
     while (!_result[0].empty()) {
-        vector<pair<int, int> > commands;
+        vector<pair<int, int>> commands;
         size_t lineCount = 0;
 
         // set up commands
@@ -61,13 +69,15 @@ bool Checker::check()
                 Car& car = _input[src].front();
                 _input[src].pop();
                 if (car._dst != dst) {
-                    cout << "Illegal car at time = " << timeCount << ". Non-existent." << endl;
+                    cout << "Illegal car at time = " << timeCount
+                         << ". Non-existent." << endl;
                     return false;
                 }
 
                 car._depTime = timeCount;
                 if (car._arrTime > car._depTime) {
-                    cout << "Illegal car at time = " << timeCount << ". Depart before Arrival." << endl;
+                    cout << "Illegal car at time = " << timeCount
+                         << ". Depart before Arrival." << endl;
                     return false;
                 }
                 _output[src].push(car);
@@ -84,9 +94,9 @@ bool Checker::check()
     }
 
     // check if scheduled all traffics
-    bool clear = true;
+    const string   dir[4] = {"north", "east", "south", "west"};
+    bool           clear  = true;
     vector<size_t> flag;
-    string dir[4] = { "north", "east", "south", "west" };
     for (size_t i = 0, end = _input.size(); i < end; ++i) {
         if (!_input[i].empty()) {
             clear = false;
@@ -98,7 +108,7 @@ bool Checker::check()
         cout << "Cars left at ";
         for (size_t i = 0, end = flag.size(); i < end; ++i) {
             cout << dir[flag[i]];
-            cout << ((i == end-1)? ".": ", ");
+            cout << ((i == end - 1) ? "." : ", ");
         }
         cout << endl;
         return false;
@@ -126,7 +136,7 @@ void Checker::parseInput(fstream& inFile)
 
     while (getline(inFile, str)) {
         stringstream ss(str);
-        int timeCount = -1;
+        int          timeCount = -1;
 
         while (ss >> token) {
             if (timeCount == -1) {
@@ -134,7 +144,7 @@ void Checker::parseInput(fstream& inFile)
                 continue;
             }
 
-            switch(token[1]) {
+            switch (token[1]) {
                 case 'N': {
                     _input[lineCount].push(Car(N, timeCount));
                     ++_carCount;
@@ -174,11 +184,12 @@ void Checker::parseResult(fstream& result)
 
     while (getline(result, str)) {
         stringstream ss(str);
-        int timeCount = -1;
+        int          timeCount = -1;
 
         while (ss >> token) {
             if (timeCount == -1) {
-                if (!(token == "N:" || token == "E:" || token == "S:" || token == "W:")) {
+                if (!(token == "N:" || token == "E:" || token == "S:" ||
+                      token == "W:")) {
                     cerr << "Wrong output format." << endl;
                     exit(1);
                 }
@@ -186,7 +197,7 @@ void Checker::parseResult(fstream& result)
                 continue;
             }
 
-            switch(token[1]) {
+            switch (token[1]) {
                 case 'N': {
                     _result[lineCount].push(N);
                     break;
@@ -218,7 +229,7 @@ void Checker::parseResult(fstream& result)
 
 void Checker::buildTables()
 {
-    /*  Right-hand drive
+    /*  Left-hand drive (right-hand traffic)
              0           1          2          3
         ---------------------------------------------
       3 |          | (SRC, N) | (DST, N) |          |
@@ -238,95 +249,83 @@ void Checker::buildTables()
     _coordinateTable[SRC][W] = Point(0, 1);
     _coordinateTable[DST][W] = Point(0, 2);
 
-    _dirTable[N] = DIR_Y;
-    _dirTable[E] = DIR_X;
-    _dirTable[S] = DIR_Y;
-    _dirTable[W] = DIR_X;
+    _initDirTable[N] = S;
+    _initDirTable[E] = W;
+    _initDirTable[S] = N;
+    _initDirTable[W] = E;
 
     return;
 }
 
-bool Checker::checkConflicts(const vector<pair<int, int> >& commands)
+bool Checker::checkConflicts(const vector<pair<int, int>>& commands)
 {
-    bool grid[4][4] = {};
+    const auto distance = [](const Point& p1, const Point& p2) -> int {
+        return abs(p1.first - p2.first) + abs(p1.second - p2.second);
+    };
+    const auto nextPos = [](const Point& src, int dir) -> Point {
+        switch (dir) {
+            case N: {
+                return Point(src.first, src.second + 1);
+            }
+            case E: {
+                return Point(src.first + 1, src.second);
+            }
+            case S: {
+                return Point(src.first, src.second - 1);
+            }
+            case W: {
+                return Point(src.first - 1, src.second);
+            }
+            default: {
+                return src;
+            }
+        }
 
+        return src;
+    };
+    const auto nextDir = [&](const Point& src, const Point& dst,
+                             int preferredDir) -> int {
+        const int numDirs = 4;
+
+        for (int i = preferredDir; i < preferredDir + numDirs; ++i) {
+            const int dir = i % numDirs;
+
+            if (distance(nextPos(src, dir), dst) < distance(src, dst)) {
+                return dir;
+            }
+        }
+
+        return preferredDir;
+    };
+    const auto move = [&](const Point& src, const Point& dst,
+                          int preferredDir) -> Point {
+        return nextPos(src, nextDir(src, dst, preferredDir));
+    };
+    const int gridWidth = 4;
+
+    bool grid[gridWidth][gridWidth] = {};
     for (const auto& c : commands) {
+        // Skip NULL cars.
         if (c.second == -1) {
             continue;
         }
 
-        const Point src = _coordinateTable[SRC][c.first];
-        const Point dst = _coordinateTable[DST][c.second];
-        const int dir = _dirTable[c.first];
+        const Point src     = _coordinateTable[SRC][c.first];
+        const Point dst     = _coordinateTable[DST][c.second];
+        const int   initDir = _initDirTable[c.first];
 
-        bool hasConflict = false;
-        int x = src.first;
-        int y = src.second;
-        if (dir == DIR_X) {
-            while (x != dst.first) {
-                (x < dst.first) ? ++x : --x;
+        Point currPos = src;
+        while (currPos != dst) {
+            currPos = move(currPos, dst, initDir);
 
-                if (grid[x][y]) {
-                    hasConflict = true;
-                    break;
-                }
+            const int currX = currPos.first;
+            const int currY = currPos.second;
 
-                grid[x][y] = true;
-            }
-
-            if (hasConflict) {
+            if (grid[currX][currY]) {
                 return true;
             }
 
-            while (y != dst.second) {
-                (y < dst.second) ? ++y : --y;
-
-                if (grid[x][y]) {
-                    hasConflict = true;
-                    break;
-                }
-
-                grid[x][y] = true;
-            }
-
-            if (hasConflict) {
-                return true;
-            }
-        }
-        else {
-            while (y != dst.second) {
-                (y < dst.second) ? ++y : --y;
-
-                if (grid[x][y]) {
-                    hasConflict = true;
-                    break;
-                }
-
-                grid[x][y] = true;
-            }
-
-            if (hasConflict) {
-                return true;
-            }
-
-            while (x != dst.first) {
-                (x < dst.first) ? ++x : --x;
-
-                if (grid[x][y]) {
-                    hasConflict = true;
-                    break;
-                }
-
-                grid[x][y] = true;
-            }
-
-            if (hasConflict) {
-                return true;
-            }
-        }
-
-        if (hasConflict) {
-            return true;
+            grid[currX][currY] = true;
         }
     }
 

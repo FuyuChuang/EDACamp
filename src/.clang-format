@@ -8,3 +8,4 @@ IndentCaseLabels: true
 AlignConsecutiveDeclarations: true
 AlignConsecutiveAssignments: true
 AlignTrailingComments: true
+BreakBeforeBraces: Linux
