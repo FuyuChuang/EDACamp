@@ -1,0 +1,10 @@
+IndentWidth: 4
+
+Language: Cpp
+
+DerivePointerAlignment: false
+PointerAlignment: Left
+IndentCaseLabels: true
+AlignConsecutiveDeclarations: true
+AlignConsecutiveAssignments: true
+AlignTrailingComments: true
