@@ -1,17 +1,25 @@
-CC=g++
-LDFLAGS=-std=c++11 -O3
-SOURCES=src/checker.cpp src/main.cpp
-OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=checker
-INCLUDES=src/checker.h src/car.h
+EXE := checker
+CXX := g++
+CXXFLAGS := -std=c++11 -Wall -O3
+SRCDIR := src
+HPPS := $(wildcard $(SRCDIR)/*.hpp)
+CPPS := $(wildcard $(SRCDIR)/*.cpp)
+OBJS := $(addprefix obj/, $(notdir $(CPPS:.cpp=.o)))
 
-all: $(SOURCES) $(EXECUTABLE)
+.PHONY: all release clean
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+release: CXXFLAGS += -DNDEBUG -static
 
-%.o:  %.c  ${INCLUDES}
-	$(CC) $(CFLAGS) $< -o $@
+all release: obj $(EXE)
+
+obj:
+	mkdir $@
+
+$(EXE): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
+
+obj/%.o: $(SRCDIR)/%.cpp $(HPPS)
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 clean:
-	rm -rf *.o $(EXECUTABLE)
+	rm $(EXE) $(OBJS)
