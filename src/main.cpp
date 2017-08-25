@@ -6,7 +6,6 @@
 ****************************************************************************/
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <string>
 #include "checker.h"
 using namespace std;
@@ -15,17 +14,17 @@ using namespace std;
 int main(int argc, char** argv)
 {
     const char* usageStr = (string("Usage: ") + argv[0] + "<input file> <result file>").c_str();
-    fstream input, output;
+    fstream input, result;
 
     if (argc == 3) {
         input.open(argv[1], ios::in);
-        output.open(argv[2], ios::in);
+        result.open(argv[2], ios::in);
         if (!input) {
             cerr << "Cannot open the input file \"" << argv[1]
                  << "\". The program will be terminated..." << endl;
             exit(1);
         }
-        if (!output) {
+        if (!result) {
             cerr << "Cannot open the output file \"" << argv[2]
                  << "\". The program will be terminated..." << endl;
             exit(1);
@@ -36,8 +35,11 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    Checker* checker = new Checker(input, output);
-    checker->check();
+    Checker checker = Checker(input, result);
+    if (checker.check()) {
+        checker.printSummary();
+    }
 
     return 0;
 }
+

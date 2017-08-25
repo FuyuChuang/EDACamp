@@ -7,23 +7,19 @@
 #ifndef CAR_H
 #define CAR_H
 
-#include <fstream>
-#include <vector>
-using namespace std;
-
-
 class Car
 {
 public:
     // constructor and destructor
-    Car(size_t dest, size_t arrTime) :
-        _dest(dest), _arrTime(arrTime), _depTime(0) {
+    Car(int dst, int arrTime) :
+        _dst(dst), _arrTime(arrTime), _depTime(-1) {
     }
     ~Car() { }
 
-    int     _dest;
-    size_t  _arrTime;
-    size_t  _depTime;
+    // data members
+    int     _dst;       // destination (N:0, E:1, S:2, W:3)
+    int     _arrTime;   // arrival time
+    int     _depTime;   // departure time
 };
 
-#endif  // CHECKER_H
+#endif  // CAR_H
