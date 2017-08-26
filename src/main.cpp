@@ -15,8 +15,6 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    const char* usageStr =
-        (string("Usage: ") + argv[0] + "<input file> <result file>").c_str();
     fstream input, result;
 
     if (argc == 3) {
@@ -33,8 +31,10 @@ int main(int argc, char** argv)
             exit(1);
         }
     } else {
-        cerr << usageStr << endl;
-        exit(1);
+        cerr << string("Usage: ") + argv[0] + " <input file> <result file>"
+             << endl;
+
+        return 1;
     }
 
     Checker checker = Checker(input, result);
